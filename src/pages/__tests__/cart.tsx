@@ -1,53 +1,49 @@
-import React from 'react';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import React, { Fragment } from "react";
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-import {
-  renderApollo,
-  cleanup,
-  getByTestId,
-  fireEvent,
-  waitForElement,
-  render,
-} from '../../test-utils';
-import Cart, { GET_CART_ITEMS } from '../cart';
+import { Header, Loading } from "../components";
+import { CartItem, BookTrips } from "../containers";
+import { RouteComponentProps } from "@reach/router";
+import { GetCartItems } from "./__generated__/GetCartItems";
 
-xdescribe('Cart Page', () => {
-  // automatically unmount and cleanup DOM after the test is finished.
-  afterEach(cleanup);
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
-  it('renders with message for empty carts', () => {
-    // TODO: why is this necessary
-    const cache = new InMemoryCache();
-    cache.writeQuery({
-      query: GET_CART_ITEMS,
-      data: { cartItems: [] },
-    });
+export const GET_CART_ITEMS = gql`
+  query GetCartItems {
+    cartItems @client
+  }
+`;
 
-    let mocks = [
-      {
-        request: { query: GET_CART_ITEMS },
-        result: { data: { cartItems: [] } },
-      },
-    ];
-    const { getByTestId } = renderApollo(<Cart />, { mocks, cache });
-    return waitForElement(() => getByTestId('empty-message'));
-  });
+const promise = loadStripe("pk_test_O6559dYT7esW4P4fLBhBc0sl006UDLkAUC");
+interface CartProps extends RouteComponentProps {}
 
-  it('renders cart', () => {
-    // TODO: why is this necessary
-    const cache = new InMemoryCache();
-    cache.writeQuery({
-      query: GET_CART_ITEMS,
-      data: { cartItems: [1] },
-    });
+const Cart: React.FC<CartProps> = () => {
+  const { data, loading, error } = useQuery<GetCartItems>(GET_CART_ITEMS);
 
-    let mocks = [
-      {
-        request: { query: GET_CART_ITEMS },
-        result: { data: { cartItems: [1] } },
-      },
-    ];
-    const { getByTestId } = renderApollo(<Cart />, { mocks, cache: undefined });
-    return waitForElement(() => getByTestId('empty-message'));
-  });
-});
+  if (loading) return <Loading />;
+  if (error) return <p>ERROR: {error.message}</p>;
+
+  return (
+    <Fragment>
+      <Header>My Cart</Header>
+      {!data || (!!data && data.cartItems.length === 0) ? (
+        <p data-testid="empty-message">No items in your cart</p>
+      ) : (
+        <Fragment>
+          {!!data &&
+            data.cartItems.map((launchId: any) => (
+              <CartItem key={launchId} launchId={launchId} />
+            ))}
+          <Elements stripe={promise}>
+              <BookTrips cartItems={!!data ? data.cartItems : []} />
+          </Elements>
+          
+        </Fragment>
+      )}
+    </Fragment>
+  );
+};
+
+export default Cart;
