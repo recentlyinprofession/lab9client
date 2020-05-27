@@ -27,17 +27,17 @@ interface LaunchProps extends RouteComponentProps {
 }
 
 const Launch: React.FC<LaunchProps> = ({ launchId }) => {
-  const {
-    data,
-    loading,
-    error
+  const { 
+    data, 
+    loading, 
+    error 
   } = useQuery<
-    LaunchDetailsTypes.LaunchDetails,
+    LaunchDetailsTypes.LaunchDetails, 
     LaunchDetailsTypes.LaunchDetailsVariables
-  >(GET_LAUNCH_DETAILS,
+  >(GET_LAUNCH_DETAILS, 
     { variables: { launchId } }
   );
-
+  
   if (loading) return <Loading />;
   if (error) return <p>ERROR: {error.message}</p>;
   if (!data) return <p>Not found</p>;

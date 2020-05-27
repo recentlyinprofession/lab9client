@@ -21,8 +21,8 @@ export const typeDefs = gql`
 `;
 
 type ResolverFn = (
-  parent: any,
-  args: any,
+  parent: any, 
+  args: any, 
   { cache } : { cache: ApolloCache<any> }
 ) => any;
 
@@ -41,7 +41,7 @@ export const resolvers: AppResolvers = {
       const queryResult = cache.readQuery<GetCartItemTypes.GetCartItems>({ query: GET_CART_ITEMS });
       if (queryResult) {
         return queryResult.cartItems.includes(launch.id)
-      }
+      } 
       return false;
     }
   },
