@@ -16,7 +16,7 @@
     "apollo-client": "^2.6.3",
     "apollo-link-http": "^1.5.15",
     "emotion": "^9.2.12",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "graphql": "^14.4.2",
     "graphql-tag": "^2.10.1",
     "polished": "^3.4.1",
